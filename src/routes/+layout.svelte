@@ -3,6 +3,7 @@
 	import Header from "$components/Header.svelte";
 	import Stats from "$components/Stats.svelte";
 	import Info from "$components/Info.svelte";
+	import Meta from "$components/Meta.svelte";
 	import { browser } from "$app/environment";
 	import { page } from "$app/stores";
 	import { setContext } from "svelte";
@@ -84,22 +85,10 @@
 	}
 </script>
 
+<Meta />
+
 <svelte:head>
-	<title>Rhymedle</title>
 	<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔔</text></svg>" />
-	<meta name="description" content="Complete the rhymes in a famous poem! A daily poetry word game." />
-	<meta property="og:title" content="Rhymedle" />
-	<meta property="og:description" content="Complete the rhymes in a famous poem! A daily poetry word game." />
-	<meta property="og:image" content="https://melaniewalsh.github.io/Rhymedle/assets/social.png" />
-	<meta property="og:image:type" content="image/png" />
-	<meta property="og:image:width" content="1200" />
-	<meta property="og:image:height" content="628" />
-	<meta property="og:url" content="https://melaniewalsh.github.io/Rhymedle/" />
-	<meta property="og:type" content="website" />
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta name="twitter:title" content="Rhymedle" />
-	<meta name="twitter:description" content="Complete the rhymes in a famous poem! A daily poetry word game." />
-	<meta name="twitter:image:src" content="https://melaniewalsh.github.io/Rhymedle/assets/social.png" />
 </svelte:head>
 
 <Header {availableDates} {selectedDate} onDateChange={changeDate} {openStats} {openInfo} {isHardMode} {toggleHardMode} />
