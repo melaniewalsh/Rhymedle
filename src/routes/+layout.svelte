@@ -90,13 +90,16 @@
 	<meta name="description" content="Complete the rhymes in a famous poem! A daily poetry word game." />
 	<meta property="og:title" content="Rhymedle" />
 	<meta property="og:description" content="Complete the rhymes in a famous poem! A daily poetry word game." />
-	<meta property="og:image" content="https://melaniewalsh.github.io/rhymedle/assets/images/rhymedle-logo.png" />
-	<meta property="og:url" content="https://melaniewalsh.github.io/rhymedle/" />
+	<meta property="og:image" content="https://melaniewalsh.github.io/Rhymedle/assets/social.png" />
+	<meta property="og:image:type" content="image/png" />
+	<meta property="og:image:width" content="1200" />
+	<meta property="og:image:height" content="628" />
+	<meta property="og:url" content="https://melaniewalsh.github.io/Rhymedle/" />
 	<meta property="og:type" content="website" />
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:title" content="Rhymedle" />
 	<meta name="twitter:description" content="Complete the rhymes in a famous poem! A daily poetry word game." />
-	<meta name="twitter:image" content="https://melaniewalsh.github.io/rhymedle/assets/images/rhymedle-logo.png" />
+	<meta name="twitter:image:src" content="https://melaniewalsh.github.io/Rhymedle/assets/social.png" />
 </svelte:head>
 
 <Header {availableDates} {selectedDate} onDateChange={changeDate} {openStats} {openInfo} {isHardMode} {toggleHardMode} />

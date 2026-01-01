@@ -10,7 +10,7 @@ const config = {
 			fallback: null
 		}),
 		paths: {
-			base: dev ? '' : '/rhymedle'
+			base: dev ? '' : '/Rhymedle'
 		}
 	}
 };
