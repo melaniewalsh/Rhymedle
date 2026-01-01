@@ -403,7 +403,7 @@
 Rhymes: ${correctCount}/${totalCount} (${attemptsUsed === 0 ? "gave up" : `${attemptsUsed} attempt${attemptsUsed > 1 ? "s" : ""}`}${hintsText}${fiftyFiftyText})
 Author: ${authorCorrect ? "✓" : "✗"}
 
-${window.location.origin}`;
+${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
 
 		navigator.clipboard.writeText(shareText).then(() => {
 			showCopyNotification = true;
