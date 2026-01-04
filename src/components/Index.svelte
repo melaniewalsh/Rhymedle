@@ -67,7 +67,8 @@
 		// Process lines to add shuffled choices
 		const processedLines = poemData.lines.map((line, lineIndex) => {
 			let choices = [];
-			if (!line.no_choices) {
+			const isBlank = !line.line_text || line.line_text.trim() === '';
+			if (!line.no_choices && !isBlank) {
 				const correctAnswer = line.correct_last_word;
 				const shuffledDistractors = seededShuffle(line.distractors, dayNumber + lineIndex);
 				const selectedDistractors = shuffledDistractors.slice(0, 2);
@@ -224,8 +225,13 @@
 		}
 	});
 
-	// Count only lines with choices
-	const linesWithChoices = poem.lines.filter((line) => !line.no_choices);
+	// Helper to check if a line is a blank/spacer line
+	function isBlankLine(line) {
+		return !line.line_text || line.line_text.trim() === '';
+	}
+
+	// Count only lines with choices (excluding blank lines)
+	const linesWithChoices = poem.lines.filter((line) => !line.no_choices && !isBlankLine(line));
 	let totalCount = $state(linesWithChoices.length);
 
 	function checkAnswer() {
@@ -233,7 +239,7 @@
 		const results = [];
 
 		poem.lines.forEach((line, index) => {
-			if (line.no_choices) {
+			if (line.no_choices || isBlankLine(line)) {
 				results.push(null);
 			} else {
 				let isCorrect;
@@ -264,6 +270,7 @@
 		if (count === totalCount || attemptsUsed >= maxAttempts) {
 			showFinalReveal = true;
 			showAuthorGuess = true;
+			showResultMessage();
 
 			// Trigger confetti for perfect rhyme score
 			if (count === totalCount) {
@@ -314,13 +321,14 @@
 	function giveUp() {
 		// Set all incorrect answers to show the reveal
 		const results = poem.lines.map((line, index) => {
-			if (line.no_choices) return null;
+			if (line.no_choices || isBlankLine(line)) return null;
 			const isCorrect = selectedWords[index] === line.correct_last_word;
 			return isCorrect ? "correct" : "incorrect";
 		});
 		lineResults = results;
 		showFinalReveal = true;
 		showAuthorGuess = true;
+		showResultMessage();
 	}
 
 	function useHint() {
@@ -330,7 +338,7 @@
 
 		// For each line with choices, reveal the first N letters based on hintsUsed
 		poem.lines.forEach((line, index) => {
-			if (!line.no_choices) {
+			if (!line.no_choices && !isBlankLine(line)) {
 				const { word: correctWord } = separateWordAndPunctuation(
 					line.correct_last_word || ""
 				);
@@ -361,6 +369,7 @@
 		poem.lines.forEach((line, index) => {
 			if (
 				!line.no_choices &&
+				!isBlankLine(line) &&
 				lineResults[index] !== "correct" &&
 				!fiftyFiftyChoices[index]
 			) {
@@ -385,7 +394,7 @@
 		fiftyFiftyChoices = newFiftyFiftyChoices;
 	}
 
-	function shareResults() {
+	async function shareResults() {
 		if (!browser) return;
 
 		const authorCorrect = selectedAuthor === poem.author_name;
@@ -405,7 +414,29 @@ Author: ${authorCorrect ? "✓" : "✗"}
 
 ${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
 
-		navigator.clipboard.writeText(shareText).then(() => {
+		// Check if we're on mobile (touch device with small screen)
+		const isMobile = 'ontouchstart' in window && window.innerWidth <= 768;
+
+		// Use Web Share API only on mobile
+		if (isMobile && navigator.share) {
+			try {
+				await navigator.share({
+					text: shareText
+				});
+			} catch (err) {
+				// User cancelled or share failed, fall back to clipboard
+				if (err.name !== 'AbortError') {
+					copyToClipboard(shareText);
+				}
+			}
+		} else {
+			// Use clipboard for desktop
+			copyToClipboard(shareText);
+		}
+	}
+
+	function copyToClipboard(text) {
+		navigator.clipboard.writeText(text).then(() => {
 			showCopyNotification = true;
 			setTimeout(() => {
 				showCopyNotification = false;
@@ -414,6 +445,26 @@ ${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
 	}
 
 	let showCopyNotification = $state(false);
+	let showResultToast = $state(false);
+	let resultToastMessage = $state('');
+
+	function showResultMessage() {
+		if (correctCount === totalCount && attemptsUsed === 1) {
+			resultToastMessage = 'Perfect!';
+		} else if (correctCount === totalCount) {
+			resultToastMessage = 'Excellent!';
+		} else if (correctCount >= totalCount * 0.7) {
+			resultToastMessage = 'Well done!';
+		} else if (correctCount >= totalCount * 0.5) {
+			resultToastMessage = 'Good effort!';
+		} else {
+			resultToastMessage = 'Keep practicing!';
+		}
+		showResultToast = true;
+		setTimeout(() => {
+			showResultToast = false;
+		}, 2000);
+	}
 
 	function getLineWithoutLastWord(lineText) {
 		const words = lineText.split(" ");
@@ -430,6 +481,13 @@ ${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
 			};
 		}
 		return { word, punctuation: "" };
+	}
+
+	function getWikipediaLink(authorName) {
+		if (!authorName) return "";
+		// Replace spaces with underscores for Wikipedia URL format
+		const formattedName = authorName.replace(/ /g, "_");
+		return `https://en.wikipedia.org/wiki/${formattedName}`;
 	}
 
 	function getLetterClass(userInput, correctWord, index, lineIndex) {
@@ -457,7 +515,7 @@ ${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
 	$effect(() => {
 		// Check if all lines with choices have been selected
 		const allSelected = poem.lines.every((line, index) => {
-			if (line.no_choices) return true; // skip lines without choices
+			if (line.no_choices || isBlankLine(line)) return true; // skip lines without choices
 			if (isHardMode) {
 				// In hard mode, check if input matches correct answer
 				const { word: correctWord } = separateWordAndPunctuation(
@@ -482,7 +540,10 @@ ${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
 		<div class="poem">
 			{#each poem.lines as line, index}
 				<p class="poem-line">
-					{#if line.no_choices}
+					<span class="line-content">
+					{#if !line.line_text || line.line_text.trim() === ''}
+						&nbsp;
+					{:else if line.no_choices}
 						{line.line_text}
 					{:else if showFinalReveal}
 						{@const { word, punctuation } = separateWordAndPunctuation(
@@ -547,12 +608,14 @@ ${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
 							</select><span class="punctuation">{punctuation}</span>
 						{/if}
 					{/if}
-
-					{#if lineResults[index]}
-						<span class="line-result {lineResults[index]}">
-							{lineResults[index] === "correct" ? "✓" : "✗"}
-						</span>
-					{/if}
+					</span>
+					<span class="line-result-column">
+						{#if lineResults[index] && !line.no_choices && !isBlankLine(line)}
+							<span class="line-result {lineResults[index]}">
+								{lineResults[index] === "correct" ? "✓" : "✗"}
+							</span>
+						{/if}
+					</span>
 				</p>
 			{/each}
 		</div>
@@ -564,7 +627,7 @@ ${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
 				class="check-button"
 				onclick={checkAnswer}
 				disabled={poem.lines.some(
-					(line, index) => !line.no_choices && selectedWords[index] === ""
+					(line, index) => !line.no_choices && !isBlankLine(line) && selectedWords[index] === ""
 				)}
 			>
 				📚 Check Answer
@@ -588,21 +651,6 @@ ${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
 		{/if}
 		{#if !isHardMode && fiftyFiftyUsed > 0}
 			<span class="fifty-fifty-used">Hints: {fiftyFiftyUsed} (50/50)</span>
-		{/if}
-		{#if showFinalReveal}
-			<span class="subtle-message">
-				{#if correctCount === totalCount && attemptsUsed === 1}
-					— Perfect!
-				{:else if correctCount === totalCount}
-					— Excellent!
-				{:else if correctCount >= totalCount * 0.7}
-					— Well done!
-				{:else if correctCount >= totalCount * 0.5}
-					— Good effort!
-				{:else}
-					— Keep practicing!
-				{/if}
-			</span>
 		{/if}
 	</div>
 
@@ -656,6 +704,14 @@ ${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
 			>
 				Read this poem →
 			</a>
+			<a
+				class="wiki-link-button"
+				href={getWikipediaLink(poem.author_name)}
+				target="_blank"
+				rel="noopener noreferrer"
+			>
+				Learn more about this author →
+			</a>
 			<button class="share-button" onclick={shareResults}>
 				<span
 					style={{
@@ -685,6 +741,10 @@ ${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
 
 	{#if showCopyNotification}
 		<div class="copy-notification">Score copied to clipboard!</div>
+	{/if}
+
+	{#if showResultToast}
+		<div class="result-toast">{resultToastMessage}</div>
 	{/if}
 </div>
 
@@ -717,6 +777,13 @@ ${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
 		font-family: "Baskerville", "Georgia", serif;
 	}
 
+	@media (max-width: 640px) {
+		.instruction-subtitle {
+			display: block;
+			margin-top: 0.25rem;
+		}
+	}
+
 	.poem {
 		background: #fefef8;
 		padding: 1.5rem;
@@ -734,6 +801,21 @@ ${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
 		/* min-height: 1.8rem; */
 		display: flex;
 		align-items: center;
+		white-space: pre-wrap;
+	}
+
+	.line-result-column {
+		width: 1.5rem;
+		min-width: 1.5rem;
+		flex-shrink: 0;
+		text-align: right;
+		margin-left: auto;
+	}
+
+	.line-content {
+		flex: 1;
+		display: flex;
+		align-items: center;
 		flex-wrap: wrap;
 	}
 
@@ -746,6 +828,8 @@ ${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
 		background: white;
 		margin-left: 0.35rem;
 		margin-right: 0.4rem;
+		height: 1.75rem;
+		box-sizing: border-box;
 	}
 
 	.punctuation {
@@ -761,7 +845,8 @@ ${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
 	}
 
 	.hard-mode-display {
-		display: inline-block;
+		display: inline-flex;
+		align-items: center;
 		font-family: "Baskerville", "Georgia", serif;
 		font-size: 15px;
 		padding: 0.25rem 0.5rem;
@@ -769,6 +854,8 @@ ${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
 		border-radius: 4px;
 		background: white;
 		min-width: 150px;
+		height: 1.75rem;
+		box-sizing: border-box;
 		cursor: text;
 		text-align: left;
 		margin-left: 0.35rem;
@@ -777,7 +864,7 @@ ${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
 
 	@media (max-width: 640px) {
 		.hard-mode-display {
-			min-width: 100px;
+			min-width: 70px;
 		}
 	}
 
@@ -944,9 +1031,8 @@ ${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
 
 	.line-result {
 		display: inline-block;
-		width: 25px;
 		font-weight: bold;
-		margin-right: 0.5rem;
+		font-size: 1rem;
 	}
 
 	.line-result.correct {
@@ -982,13 +1068,6 @@ ${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
 		margin-left: 1rem;
 		color: #f59e0b;
 		font-weight: bold;
-	}
-
-	.attempts-info .subtle-message {
-		margin-left: 0.5rem;
-		color: #666;
-		font-style: italic;
-		font-size: 0.95rem;
 	}
 
 	.final-result {
@@ -1060,7 +1139,7 @@ ${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
 	}
 
 	.author-guess-section {
-		margin-top: 1rem;
+		margin-top: 2rem;
 		text-align: center;
 	}
 
@@ -1212,6 +1291,28 @@ ${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
 		transform: translateY(-2px);
 	}
 
+	.wiki-link-button {
+		display: block;
+		width: 100%;
+		text-align: center;
+		padding: 0.75rem 1.5rem;
+		margin-top: 0.5rem;
+		background: white;
+		border: 1px solid black;
+		border-radius: 8px;
+		color: #333;
+		text-decoration: none;
+		font-size: 15px;
+		transition: all 0.2s;
+		font-family: "Baskerville", "Georgia", serif;
+		cursor: pointer;
+	}
+
+	.wiki-link-button:hover {
+		background: #f5f5f5;
+		transform: translateY(-2px);
+	}
+
 	.share-button {
 		display: block;
 		width: 100%;
@@ -1245,6 +1346,24 @@ ${window.location.origin}${window.location.pathname.replace(/\/$/, '')}`;
 		border-radius: 8px;
 		padding: 1.5rem 2rem;
 		font-size: 16px;
+		font-weight: 600;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+		z-index: 1000;
+		animation: fadeInUp 0.3s ease-out;
+		font-family: "Baskerville", "Georgia", serif;
+	}
+
+	.result-toast {
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		background: #fefef8;
+		color: rgb(16, 73, 60);
+		border: 1px solid black;
+		border-radius: 8px;
+		padding: 1.5rem 2rem;
+		font-size: 18px;
 		font-weight: 600;
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 		z-index: 1000;

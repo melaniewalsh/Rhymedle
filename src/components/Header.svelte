@@ -1,8 +1,5 @@
 <script>
 	let {
-		availableDates = [],
-		selectedDate = "",
-		onDateChange = () => {},
 		openStats = () => {},
 		openInfo = () => {},
 		isHardMode = false,
@@ -13,7 +10,18 @@
 <header>
 	<nav class="nav-bar">
 		<div class="nav-left">
-			<button class="info-button" onclick={openInfo} title="How to Play">
+			<div class="mode-toggle">
+				<span class="mode-label" class:active={isHardMode}>Hard</span>
+				<div class="toggle-switch" onclick={toggleHardMode} role="button" tabindex="0" onkeydown={(e) => e.key === 'Enter' && toggleHardMode()}>
+					<div class="toggle-track" class:easy={!isHardMode}></div>
+					<div class="toggle-thumb" class:easy={!isHardMode}></div>
+				</div>
+				<span class="mode-label" class:active={!isHardMode}>Easy</span>
+			</div>
+		</div>
+		<h1>🔔 Rhymedle</h1>
+		<div class="nav-right">
+			<button class="icon-button" onclick={openInfo} title="How to Play">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					viewBox="0 0 20 20"
@@ -26,28 +34,7 @@
 					/>
 				</svg>
 			</button>
-			<select
-				class="date-select"
-				value={selectedDate}
-				onchange={onDateChange}
-				title="Play another game"
-			>
-				{#each availableDates as dateOption}
-					<option value={dateOption.value}>{dateOption.label}</option>
-				{/each}
-			</select>
-		</div>
-		<h1>Rhymedle</h1>
-		<div class="nav-right">
-			<div class="mode-toggle">
-				<span class="mode-label" class:active={isHardMode}>Hard</span>
-				<div class="toggle-switch" onclick={toggleHardMode}>
-					<div class="toggle-track" class:easy={!isHardMode}></div>
-					<div class="toggle-thumb" class:easy={!isHardMode}></div>
-				</div>
-				<span class="mode-label" class:active={!isHardMode}>Easy</span>
-			</div>
-			<button class="stats-button" onclick={openStats} title="View Statistics">
+			<button class="icon-button" onclick={openStats} title="View Statistics">
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
 					viewBox="0 0 20 20"
@@ -65,7 +52,8 @@
 <style>
 	header {
 		text-align: center;
-		padding: 1rem 1rem 1rem;
+		padding: 0.75rem 1rem;
+		border-bottom: 1px solid #ccc;
 	}
 
 	.nav-bar {
@@ -73,18 +61,18 @@
 		align-items: center;
 		justify-content: space-between;
 		max-width: 500px;
-		margin: 0 auto 0.75rem;
+		margin: 0 auto;
 	}
 
 	.nav-left {
-		width: 120px;
 		display: flex;
 		justify-content: flex-start;
 		align-items: center;
-		gap: 1.5rem;
+		gap: 0.5rem;
+		width: 120px;
 	}
 
-	.info-button {
+	.icon-button {
 		background: none;
 		border: none;
 		cursor: pointer;
@@ -93,67 +81,27 @@
 		transition: color 0.2s;
 	}
 
-	.info-button svg {
+	.icon-button svg {
 		width: 1.25rem;
 		height: 1.25rem;
 	}
 
-	.info-button:hover {
+	.icon-button:hover {
 		color: #333;
 	}
 
 	.nav-right {
 		display: flex;
 		align-items: center;
-		gap: 0.75rem;
-		width: 120px;
 		justify-content: flex-end;
+		gap: 0.5rem;
+		width: 120px;
 	}
 
 	h1 {
-		font-size: 2rem;
+		font-size: 1.5rem;
 		font-weight: bold;
 		margin: 0;
-	}
-
-	.stats-button {
-		background: none;
-		border: none;
-		cursor: pointer;
-		padding: 0.25rem;
-		color: #666;
-		transition: color 0.2s;
-	}
-
-	.stats-button svg {
-		width: 1.25rem;
-		height: 1.25rem;
-	}
-
-	.stats-button:hover {
-		color: #333;
-	}
-
-	.date-select {
-		font-family: "Baskerville", "Georgia", serif;
-		font-size: 0.9rem;
-		padding: 0.2rem 0.35rem;
-		border: 1px solid #ccc;
-		border-radius: 4px;
-		background: white;
-		color: #666;
-		cursor: pointer;
-		transition: all 0.2s;
-	}
-
-	.date-select:hover {
-		border-color: #999;
-		color: #333;
-	}
-
-	.date-select:focus {
-		outline: none;
-		border-color: #666;
 	}
 
 	.mode-toggle {
@@ -177,8 +125,8 @@
 	.toggle-switch {
 		position: relative;
 		display: inline-block;
-		width: 2.5rem;
-		height: 1.25rem;
+		width: 2.25rem;
+		height: 1.125rem;
 		cursor: pointer;
 	}
 
@@ -201,8 +149,8 @@
 		position: absolute;
 		top: 0.125rem;
 		left: 0.125rem;
-		width: 1rem;
-		height: 1rem;
+		width: 0.875rem;
+		height: 0.875rem;
 		background-color: white;
 		border-radius: 9999px;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -210,45 +158,26 @@
 	}
 
 	.toggle-thumb.easy {
-		transform: translateX(1.25rem);
+		transform: translateX(1.125rem);
 	}
 
 	@media (max-width: 640px) {
-		.nav-bar {
-			position: relative;
-			justify-content: flex-end;
-		}
-
 		h1 {
-			font-size: 1.5rem;
-			position: absolute;
-			left: 50%;
-			transform: translateX(-50%);
+			font-size: 1.25rem;
 		}
 
-		.nav-left {
-			position: absolute;
-			left: 0;
-			margin-left: -0.5rem;
+		.nav-left, .nav-right {
+			width: 80px;
 		}
 
-		.info-button svg {
+		.icon-button svg {
 			width: 1rem;
 			height: 1rem;
 		}
 
-		.date-select {
-			font-size: 0.65rem;
-			padding: 0.15rem 0.25rem;
-		}
-
-		.nav-right {
-			width: auto;
-			margin-right: -0.5rem;
-		}
-
 		.mode-toggle {
-			font-size: 0.55rem;
+			font-size: 0.65rem;
+			gap: 0.15rem;
 		}
 
 		.toggle-switch {
@@ -259,15 +188,12 @@
 		.toggle-thumb {
 			width: 0.625rem;
 			height: 0.625rem;
+			top: 0.125rem;
+			left: 0.125rem;
 		}
 
 		.toggle-thumb.easy {
 			transform: translateX(0.875rem);
-		}
-
-		.stats-button svg {
-			width: 1rem;
-			height: 1rem;
 		}
 	}
 </style>

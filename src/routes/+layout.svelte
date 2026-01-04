@@ -1,6 +1,7 @@
 <script>
 	import "$styles/app.css";
 	import Header from "$components/Header.svelte";
+	import Footer from "$components/Footer.svelte";
 	import Stats from "$components/Stats.svelte";
 	import Info from "$components/Info.svelte";
 	import Meta from "$components/Meta.svelte";
@@ -91,15 +92,33 @@
 	<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔔</text></svg>" />
 </svelte:head>
 
-<Header {availableDates} {selectedDate} onDateChange={changeDate} {openStats} {openInfo} {isHardMode} {toggleHardMode} />
-<main id="content" style:visibility={mounted ? 'visible' : 'hidden'}>
-	{@render children?.()}
-</main>
+<div class="app-wrapper">
+	<Header {openStats} {openInfo} {isHardMode} {toggleHardMode} />
+	<main id="content" style:visibility={mounted ? 'visible' : 'hidden'}>
+		{@render children?.()}
+	</main>
+	<Footer {availableDates} {selectedDate} onDateChange={changeDate} />
+</div>
 <Stats isOpen={showStats} onClose={closeStats} />
 <Info isOpen={showInfo} onClose={closeInfo} />
 
 <style>
 	:global(body) {
 		background-color: #f3fafc;
+		margin: 0;
+	}
+
+	:global(html, body) {
+		height: 100%;
+	}
+
+	.app-wrapper {
+		min-height: 100vh;
+		display: flex;
+		flex-direction: column;
+	}
+
+	main {
+		flex: 1;
 	}
 </style>

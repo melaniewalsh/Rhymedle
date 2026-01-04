@@ -49,9 +49,8 @@
 			</div>
 
 			<div class="section credits">
-				<p>
-					Made by <a href="https://melaniewalsh.org/" target="_blank" rel="noopener noreferrer">Melanie Walsh</a>.
-				</p>
+				<p>Made by <a href="https://melaniewalsh.org/" target="_blank" rel="noopener noreferrer">Melanie Walsh</a></p>
+				<p class="also-try">Also try <a href="https://www.versedle.com" target="_blank" rel="noopener noreferrer">Versedle</a> - guess the author — one line at a time!</p>
 			</div>
 		</div>
 	</div>
@@ -187,5 +186,9 @@
 
 	.credits a:hover {
 		color: #333;
+	}
+
+	.also-try {
+		margin-top: 0.75rem;
 	}
 </style>
