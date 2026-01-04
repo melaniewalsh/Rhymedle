@@ -171,29 +171,29 @@
 		}
 
 		.icon-button svg {
-			width: 1rem;
-			height: 1rem;
+			width: 1.5rem;
+			height: 1.5rem;
 		}
 
 		.mode-toggle {
-			font-size: 0.65rem;
-			gap: 0.15rem;
+			font-size: 0.8rem;
+			gap: 0.2rem;
 		}
 
 		.toggle-switch {
-			width: 1.75rem;
-			height: 0.875rem;
+			width: 2.25rem;
+			height: 1.125rem;
 		}
 
 		.toggle-thumb {
-			width: 0.625rem;
-			height: 0.625rem;
+			width: 0.875rem;
+			height: 0.875rem;
 			top: 0.125rem;
 			left: 0.125rem;
 		}
 
 		.toggle-thumb.easy {
-			transform: translateX(0.875rem);
+			transform: translateX(1.125rem);
 		}
 	}
 </style>
