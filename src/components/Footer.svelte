@@ -68,12 +68,12 @@
 
 	@media (max-width: 640px) {
 		label {
-			font-size: 0.8rem;
+			font-size: 1rem;
 		}
 
 		.date-select {
-			font-size: 0.8rem;
-			padding: 0.25rem 0.4rem;
+			font-size: 1rem;
+			padding: 0.4rem 0.6rem;
 		}
 	}
 </style>
