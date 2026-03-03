@@ -41,6 +41,12 @@ const authorImages = {
 	'William Shakespeare': 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/William_Shakespeare_by_John_Taylor%2C_edited.jpg/330px-William_Shakespeare_by_John_Taylor%2C_edited.jpg',
 	'William Wordsworth': 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Wordsworth_on_Helvellyn_by_Benjamin_Robert_Haydon.jpg/330px-Wordsworth_on_Helvellyn_by_Benjamin_Robert_Haydon.jpg',
 	'Adrienne Rich': 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Adrienne_Rich_%28cropped%29.jpg/330px-Adrienne_Rich_%28cropped%29.jpg',
+	'Christina Rossetti': 'https://upload.wikimedia.org/wikipedia/commons/4/4f/Christina_Rossetti_3.jpg',
+	'Henry Wadsworth Longfellow': 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a7/Henry_Wadsworth_Longfellow%2C_photographed_by_Julia_Margaret_Cameron_in_1868.jpg/330px-Henry_Wadsworth_Longfellow%2C_photographed_by_Julia_Margaret_Cameron_in_1868.jpg',
+	'Langston Hughes': 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Langston_Hughes_by_Carl_Van_Vechten_Trim.jpg/330px-Langston_Hughes_by_Carl_Van_Vechten_Trim.jpg',
+	'Maya Angelou': 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Angelou_at_Clinton_inauguration_%28cropped_2%29.jpg/330px-Angelou_at_Clinton_inauguration_%28cropped_2%29.jpg',
+	'William Butler Yeats': 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Yeats_Boughton.jpg/330px-Yeats_Boughton.jpg',
+	'Philip Larkin': 'https://upload.wikimedia.org/wikipedia/en/4/48/Philip_Larkin_in_a_library.gif',
 };
 
 // Seeded shuffle function for deterministic randomization

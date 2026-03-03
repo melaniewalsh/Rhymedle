@@ -70,8 +70,10 @@
 			const isBlank = !line.line_text || line.line_text.trim() === '';
 			if (!line.no_choices && !isBlank) {
 				const correctAnswer = line.correct_last_word;
-				const shuffledDistractors = seededShuffle(line.distractors, dayNumber + lineIndex);
-				const selectedDistractors = shuffledDistractors.slice(0, 2);
+				// First distractor is priority (humorous/tricky) — always include it
+				const priorityDistractor = line.distractors[0];
+				const otherDistractors = seededShuffle(line.distractors.slice(1), dayNumber + lineIndex);
+				const selectedDistractors = [priorityDistractor, otherDistractors[0]].filter(Boolean);
 				const allOptions = [correctAnswer, ...selectedDistractors];
 				choices = seededShuffle(allOptions, dayNumber + lineIndex + 1000);
 			}
